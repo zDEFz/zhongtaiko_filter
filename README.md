@@ -1,4 +1,4 @@
-# zhongtaiko_filter
+# zhongtaiko_filter_py
 
 `zhongtaiko_filter_py` is a minimal evdev-based input filter for ZhongTaiko [Pro] drum controllers.  
 It eliminates ghost keypresses by grabbing the raw input device and forwarding only legitimate hit events (`D`, `F`, `J`, `K`) through a virtual input device.
@@ -21,9 +21,9 @@ This script needs root access to:
 ## 📦 Installation (AUR)
 
 ```bash
-yay -S taiko-filter
+yay -S zhongtaiko_filter_py
 # OR 
-paru -S taiko filter
+paru -S zhongtaiko_filter_py
 ```
 
 ## Disclaimer
