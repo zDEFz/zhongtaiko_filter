@@ -1,6 +1,6 @@
-# taiko-filter
+# zhongtaiko-filter
 
-`taiko-filter` is a minimal evdev-based input filter for ZhongTaiko [Pro] drum controllers.  
+`zhongtaiko-filter` is a minimal evdev-based input filter for ZhongTaiko [Pro] drum controllers.  
 It eliminates ghost keypresses by grabbing the raw input device and forwarding only legitimate hit events (`D`, `F`, `J`, `K`) through a virtual input device.
 
 This ensures cleaner input for games like *Taiko no Tatsujin*, where phantom key events can cause dropped combos or misfires.
