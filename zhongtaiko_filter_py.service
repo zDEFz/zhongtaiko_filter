@@ -1,9 +1,10 @@
 [Unit]
-Description=Zhong Taiko Filter Script
+Description=zhongtaiko_filter_py
 After=multi-user.target
+Documentation=https://github.com/zDEFz/zhongtaiko_filter_py
 
 [Service]
-ExecStart=/usr/bin/python3 /usr/lib/zhongtaiko-filter/zhongtaiko_filter.py
+ExecStart=/usr/bin/python /usr/lib/zhongtaiko_filter_py/zhongtaiko_filter_py.py
 User=root
 Group=root
 Restart=on-failure
@@ -11,3 +12,4 @@ Environment=PYTHONUNBUFFERED=1
 
 [Install]
 WantedBy=multi-user.target
+
