@@ -23,7 +23,7 @@ package() {
   
   # Install the systemd service file
   install -Dm644 "$srcdir/zhongtaiko-filter.service" \
-    "$pkgdir/etc/systemd/system/zhongtaiko-filter.service"
+    "$pkgdir/etc/systemd/system/zhongtaiko_filter.service"
 
   # Optionally install documentation & license
   install -Dm644 "$srcdir/README.md" \
