@@ -1,0 +1,19 @@
+# This is the install script for enabling the service
+
+post_install() {
+  echo "Enabling and starting zhongtaiko_filter service..."
+
+  # Enable and start the systemd service
+  systemctl enable zhongtaiko_filter.service --now
+}
+
+# Called during upgrade
+post_upgrade() {
+  post_install
+}
+
+# If you want to remove the service when uninstalling
+pre_remove() {
+  systemctl stop zhongtaiko_filter.service
+  systemctl disable zhongtaiko_filter.service
+}
