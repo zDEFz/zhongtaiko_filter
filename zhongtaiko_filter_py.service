@@ -1,15 +1,24 @@
 [Unit]
-Description=zhongtaiko_filter_py
-After=multi-user.target
-Documentation=https://github.com/zDEFz/zhongtaiko_filter_py
+Description=Zhong Taiko Filter Script
+After=network.target
 
 [Service]
-ExecStart=/usr/bin/python /usr/lib/zhongtaiko_filter_py/zhongtaiko_filter_py.py
+ExecStart=/usr/bin/python3 /usr/lib/zhongtaiko-filter/zhongtaiko_filter.py
+
+# Permissions
 User=root
 Group=root
-Restart=on-failure
+
+# Environment
 Environment=PYTHONUNBUFFERED=1
+
+# Restart on failure
+Restart=on-failure
+RestartSec=5
+
+# Hardening (optional, tighten later once debugged)
+# ProtectSystem=full
+# NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target
-
