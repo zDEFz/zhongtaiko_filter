@@ -6,10 +6,8 @@ from evdev import InputDevice, UInput, ecodes
 
 DEVICE_PATH = '/dev/input/by-id/usb-03eb_Keyboard-event-kbd'
 
-def log(msg):
-    print(msg, flush=True)
-
-log("🟢 Script started")
+def log_error(msg):
+    print(f"ERROR: {msg}", file=sys.stderr, flush=True)
 
 # 1) Wait for device with exponential backoff
 delay = 0.01
@@ -22,7 +20,8 @@ for attempt in range(50):
     else:
         time.sleep(0.1)
 else:
-    log(f"❌ Device not found: {DEVICE_PATH}")
+    log_error(f"Device not found: {DEVICE_PATH}")
+    log_error(f"Device error: {e}")
     sys.exit(1)
 
 # 2) Open device with minimal setup
@@ -31,10 +30,9 @@ try:
     dev.grab()
     fd = dev.fd
 except Exception as e:
-    log(f"⚠️ Device error: {e}")
     sys.exit(1)
 
-log("✅ Taiko filter running")
+log("✅ Taiko filter running (ultra-optimized)")
 
 # 3) Pre-configure uinput with minimal capabilities
 ui = UInput(
@@ -62,8 +60,7 @@ try:
 except KeyboardInterrupt:
     pass
 except Exception as e:
-    log(f"⚠️ Runtime error: {e}")
+    log_error(f"Runtime error: {e}")
 finally:
     ui.close()
     dev.ungrab()
-    log("🛑 Taiko filter stopped")
