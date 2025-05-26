@@ -1,55 +1,68 @@
 #!/usr/bin/env python3
 import sys
-import evdev
-import time
 import os
-from evdev import UInput, ecodes, InputDevice
+import time
+from evdev import InputDevice, UInput, ecodes
 
 DEVICE_PATH = '/dev/input/by-id/usb-03eb_Keyboard-event-kbd'
 
-# 0) Unbuffered prints
 def log(msg):
-    print(msg)
-    sys.stdout.flush()
+    print(msg, flush=True)
 
 log("🟢 Script started")
 
-# 1) Wait for the device to appear
-for attempt in range(30):  # wait up to ~30 seconds
+# 1) Wait for device with exponential backoff
+delay = 0.01
+for attempt in range(50):
     if os.path.exists(DEVICE_PATH):
         break
-    log(f"⏳ Waiting for device: {DEVICE_PATH}")
-    time.sleep(1)
+    if attempt < 10:
+        time.sleep(delay)
+        delay = min(delay * 1.2, 0.1)
+    else:
+        time.sleep(0.1)
 else:
-    log(f"❌ Device not found after waiting: {DEVICE_PATH}")
+    log(f"❌ Device not found: {DEVICE_PATH}")
     sys.exit(1)
 
-# 2) Try to open and grab the device
+# 2) Open device with minimal setup
 try:
     dev = InputDevice(DEVICE_PATH)
     dev.grab()
+    fd = dev.fd
 except Exception as e:
-    log(f"⚠️ Failed to open or grab device: {e}")
+    log(f"⚠️ Device error: {e}")
     sys.exit(1)
 
-log("✅ Taiko filter running. Press D/F/J/K on the drum to see it forwarded.")
+log("✅ Taiko filter running")
 
-# 3) Create the uinput device
+# 3) Pre-configure uinput with minimal capabilities
 ui = UInput(
-    { ecodes.EV_KEY: [ecodes.KEY_D, ecodes.KEY_F, ecodes.KEY_J, ecodes.KEY_K] },
+    {ecodes.EV_KEY: [ecodes.KEY_D, ecodes.KEY_F, ecodes.KEY_J, ecodes.KEY_K]},
     name="taiko-filter",
     version=0x3
 )
 
-# 4) Event loop
+# 4) Pre-cache key codes for fastest lookup
+TARGET_KEYS = frozenset([ecodes.KEY_D, ecodes.KEY_F, ecodes.KEY_J, ecodes.KEY_K])
+EV_KEY = ecodes.EV_KEY
+
+# 5) Ultra-optimized main loop - no select(), direct blocking read
 try:
-    for event in dev.read_loop():
-        if event.type == ecodes.EV_KEY and event.code in (
-            ecodes.KEY_D, ecodes.KEY_F, ecodes.KEY_J, ecodes.KEY_K
-        ):
-            log(f"➡️ Handled event: {event}")
-            ui.write_event(event)
-            ui.syn()
+    read_event = dev.read_one
+    write_event = ui.write_event
+    syn = ui.syn
+    
+    while True:
+        event = read_event()
+        if event and event.type == EV_KEY and event.code in TARGET_KEYS:
+            write_event(event)
+            syn()
+
+except KeyboardInterrupt:
+    pass
+except Exception as e:
+    log(f"⚠️ Runtime error: {e}")
 finally:
     ui.close()
     dev.ungrab()
